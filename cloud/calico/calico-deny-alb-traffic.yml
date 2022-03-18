@@ -1,0 +1,26 @@
+# Deny all incoming TCP traffic from any source IP to the ALB IP address and port
+- apiVersion: projectcalico.org/v3
+  kind: GlobalNetworkPolicy
+  metadata:
+    name: deny-alb-traffic
+  spec:
+    applyOnForward: true
+    preDNAT: true
+    ingress:
+    - action: Deny
+      destination:
+        nets:
+        # (ALB) Automatic Load Balancer (= Ingress Subdomain)
+        # dig <cluster-name>.<region>.containers.appdomain.cloud
+        - 149.81.67.38/32
+        - 169.50.19.214/32
+        - 161.156.130.142/32
+        ports:
+        - 80
+        - 443
+      protocol: TCP
+      source: {}
+    selector: ibm.role == 'worker_public'
+    order: 4000
+    types:
+    - Ingress

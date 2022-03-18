@@ -1,0 +1,81 @@
+---
+# Application to deploy
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: mytodo
+spec:
+  replicas: 2 # tells deployment to run 2 pods matching the template
+  template:   # create pods using pod definition in this template
+    metadata:
+      labels:
+        app: mytodo
+        tier: frontend
+    spec:
+      containers:
+      - name: mytodo
+        image: <region>.icr.io/<namespace>/mytodo-<lastname>:1.0
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 250m     # 250 millicores = 1/4 core
+            memory: 100Mi # 100 MB
+          limits:
+            cpu: 500m
+            memory: 300Mi
+        volumeMounts:
+          - mountPath: /opt/service-bind # Mount the "service-bind-volume" volume into the pod.
+            name: service-bind-volume
+      volumes:
+        - name: service-bind-volume
+          secret:
+            defaultMode: 420
+            secretName: binding-mytodo-cloudant
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mytodo-ingress
+  annotations:
+    kubernetes.io/ingress.class: "public-iks-k8s-nginx"
+    #kubernetes.io/ingress.class: "private-iks-k8s-nginx"
+spec:
+  rules:
+  - host: <ingress-subdomain>
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: mytodo
+            port:
+              number: 8080
+  # - host: www.mycustomdomain.com
+  #   http:
+  #     paths:
+  #     - path: /
+  #       pathType: Prefix
+  #       backend:
+  #         service:
+  #           name: mytodo
+  #           port: 
+  #             number: 3000
+
+---
+# Service to expose frontend
+apiVersion: v1
+kind: Service
+metadata:
+  name: mytodo
+  labels:
+    app: mytodo
+    tier: frontend
+spec:
+  ports:
+  - protocol: TCP
+    port: 8080
+  selector:
+    app: mytodo
+    tier: frontend

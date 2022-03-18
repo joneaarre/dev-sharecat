@@ -1,0 +1,78 @@
+---
+# Application to deploy
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: mytodo
+spec:
+  replicas: 2 # tells deployment to run 2 pods matching the template
+  selector:
+    matchLabels:
+      app: mytodo
+  template: # create pods using pod definition in this template
+    metadata:
+      labels:
+        app: mytodo
+        tier: frontend
+    spec:
+      containers:
+      - name: mytodo
+        image: <region>.icr.io/<namespace>/mytodo:1.0
+        imagePullPolicy: Always
+        ports: #istio
+        - containerPort: 8080 #istio
+        resources:
+          requests:
+            cpu: 250m     # 250 millicores = 1/4 core
+            memory: 128Mi # 128 MB
+          limits:
+            cpu: 500m
+            memory: 384Mi
+        volumeMounts:
+          - mountPath: /opt/service-bind # Mount the "service-bind-volume" volume into the pod.
+            name: service-bind-volume
+      volumes:
+        - name: service-bind-volume
+          secret:
+            defaultMode: 420
+            secretName: binding-cloudant-for-kubernetes
+---
+# Service to expose frontend
+apiVersion: v1
+kind: Service
+metadata:
+  name: mytodo
+  labels:
+    app: mytodo
+    tier: frontend
+spec:
+  # if your cluster supports it, uncomment the following to automatically create
+  # an external load-balanced IP for the frontend service.
+  # type: LoadBalancer
+  #istio type: NodePort
+  ports:
+  - port: 8080 # Internal Port
+    name: http #istio
+    #nodePort: 31513
+  selector:
+    app: mytodo
+    tier: frontend
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: gateway
+  annotations:
+    kubernetes.io/ingress.class: "istio"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /.*
+        pathType: Prefix
+        backend:
+          service:
+            name: mytodo
+            port:
+              number: 8080
