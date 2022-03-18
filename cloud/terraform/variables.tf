@@ -132,7 +132,7 @@ variable "kubernetes_worker_nodes_per_zone" {
 variable "kubernetes_version" {
   description = "Specify the Kubernetes version, including the major.minor version. To see available versions, run `ibmcloud ks versions`."
   type        = string
-  default     = "1.22.4"
+  default     = "1.22.7"
 }
 
 variable "kubernetes_wait_till" {
@@ -176,7 +176,7 @@ variable "openshift_worker_pool_flavor" {
 variable "openshift_version" {
   description = "The OpenShift version that you want to set up in your cluster."
   type        = string
-  default     = "4.8.21_openshift"
+  default     = "4.8.31_openshift"
 }
 
 variable "openshift_worker_nodes_per_zone" {
@@ -367,7 +367,7 @@ variable "icd_mongo_whitelist" {
   description = "Database Whitelist It is set of IP Address and description"
 }
 variable "icd_mongo_service_endpoints" {
-  default     = "public"
+  default     = "private"
   type        = string
   description = "Types of the service endpoints. Possible values are 'public', 'private', 'public-and-private'."
 }
@@ -401,7 +401,7 @@ variable "icd_postgres_whitelist" {
   description = "Database Whitelist It is set of IP Address and description"
 }
 variable "icd_postgres_service_endpoints" {
-  default     = "public"
+  default     = "private"
   type        = string
   description = "Types of the service endpoints. Possible values are 'public', 'private', 'public-and-private'."
 }
