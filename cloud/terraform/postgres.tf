@@ -39,7 +39,7 @@ resource "time_sleep" "wait_for_postgres_initialization" {
   # count = tobool(var.use_vpe) ? 1 : 0
 
   depends_on = [
-    ibm_database.icd_postgres
+    ibm_database.icd_postgresql
   ]
 
   create_duration = "5m"
