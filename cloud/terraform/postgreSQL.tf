@@ -16,7 +16,7 @@ resource "ibm_database" "icd_postgresql" {
   key_protect_key           = ibm_kp_key.key.id
   backup_encryption_key_crn = ibm_kp_key.key.id
   depends_on = [ # require when using encryption key otherwise provisioning failed
-    ibm_iam_authorization_policy.mongo-kms,
+    ibm_iam_authorization_policy.postgres-kms,
   ]
 
   # DB Settings
@@ -76,7 +76,7 @@ resource "ibm_is_virtual_endpoint_gateway" "vpe_postgres" {
 }
 
 data "ibm_is_virtual_endpoint_gateway_ips" "postgres_vpe_ips" {
-  gateway = ibm_is_virtual_endpoint_gateway.vpe_mongo.id
+  gateway = ibm_is_virtual_endpoint_gateway.vpe_postgres.id
 }
 
 output "postgres_vpe_ips" {
