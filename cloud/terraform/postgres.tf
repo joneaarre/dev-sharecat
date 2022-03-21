@@ -56,7 +56,7 @@ resource "ibm_is_virtual_endpoint_gateway" "vpe_postgres" {
   vpc            = ibm_is_vpc.vpc.id
 
   target {
-    crn           = ibm_database.icd_postgres.id
+    crn           = ibm_database.icd_postgresql.id
     resource_type = "provider_cloud_service"
   }
 
