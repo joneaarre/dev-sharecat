@@ -15,7 +15,8 @@ resource "ibm_database" "icd_postgresql" {
   key_protect_instance      = ibm_resource_instance.key-protect.id
   key_protect_key           = ibm_kp_key.key.id
   backup_encryption_key_crn = ibm_kp_key.key.id
-  depends_on = [ # require when using encryption key otherwise provisioning failed
+  depends_on = [ 
+    # require when using encryption key otherwise provisioning failed
     ibm_iam_authorization_policy.postgres-kms,
   ]
 
